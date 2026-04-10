@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Cisco Debug Database{% endblock %}
+
+{% block content %}
+<div class="toolbar">
+    <h1>{% if user.role == "admin" %}All Issues{% else %}My Issues{% endif %}</h1>
+    <div class="toolbar-actions">
+        {% if user.role == "admin" %}
+        <a href="/dashboard" class="btn btn-secondary">Reload</a>
+        {% endif %}
+        {% if user.role == "client" %}
+        <a href="/posts/new" class="btn btn-primary">+ New Issue</a>
+        {% endif %}
+    </div>
+</div>
+
+{% if posts %}
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Issue</th>
+            <th>Status</th>
+            <th>Priority</th>
+            {% if user.role == "admin" %}<th>Submitted By</th>{% endif %}
+            <th>Created</th>
+            {% if user.role == "admin" %}<th>Actions</th>{% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for post in posts %}
+        <tr>
+            <td>{{ post.id }}</td>
+            <td>{{ post.issue }}</td>
+            <td>
+                {% if post.stat == "Issue submitted" %}
+                    <span class="badge badge-submitted">Submitted</span>
+                {% elif post.stat == "In review" %}
+                    <span class="badge badge-review">In Review</span>
+                {% elif post.stat == "Issue resolved" %}
+                    <span class="badge badge-resolved">Resolved</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if post.priority >= 2 %}
+                    <span class="priority-high">High ({{ post.priority }})</span>
+                {% elif post.priority == 1 %}
+                    <span class="priority-med">Med ({{ post.priority }})</span>
+                {% else %}
+                    <span class="priority-low">Low</span>
+                {% endif %}
+            </td>
+            {% if user.role == "admin" %}
+            <td>{{ users.get(post.user_id, "Unknown") }}</td>
+            {% endif %}
+            <td>{{ post.created_at.strftime("%Y-%m-%d") if post.created_at else "—" }}</td>
+            {% if user.role == "admin" %}
+            <td class="actions">
+                <a href="/posts/{{ post.id }}/edit" class="btn btn-secondary">Edit</a>
+                <form method="post" action="/posts/{{ post.id }}/delete" style="display:inline"
+                      onsubmit="return confirm('Delete this issue?')">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="empty-state">
+    {% if user.role == "client" %}
+        No issues submitted yet. <a href="/posts/new">Create one.</a>
+    {% else %}
+        No issues in the database.
+    {% endif %}
+</p>
+{% endif %}
+{% endblock %}

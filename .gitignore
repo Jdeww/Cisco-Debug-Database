@@ -1,0 +1,29 @@
+# Virtual environment
+Cisco-env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# SQLite databases (if ever used locally)
+*.db
+*.sqlite3
+
+# Environment / secrets
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Distribution / build
+dist/
+build/
+*.egg-info/
